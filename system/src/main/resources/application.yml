@@ -1,0 +1,24 @@
+server:
+  port: 8020
+
+spring:
+  application:
+    name: system
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    username: root
+    password: root
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8010/eureka/
+

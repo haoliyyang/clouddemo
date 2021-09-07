@@ -1,0 +1,31 @@
+server:
+  port: 8030
+
+spring:
+  application:
+    name: getaway
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    username: root
+    password: root
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: system-routes
+          uri: lb://system
+          predicates:
+            - Path=/userController/**
+        - id: cloudservice-routes
+          uri: lb://contactmanger
+          predicates:
+            - Path=/tbContactController/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8010/eureka/
