@@ -39,7 +39,7 @@ public final class TbUserResponseDTO {
      * 性别
      */
     @ApiModelProperty(value = "性别",notes = "性别")
-     private final Boolean gender;
+     private final Integer gender;
     /**
      * 生日
      */

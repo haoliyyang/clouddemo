@@ -1,5 +1,6 @@
 package com.cloud.system.entity;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -43,7 +44,11 @@ public final class TbUser implements Serializable {
      * 性别
      */
     @ApiModelProperty(value = "性别",notes = "性别")
-    private final boolean gender;
+    private final Integer gender;
+
+    @ApiModelProperty(value = "性别名称",notes = "性别名称")
+    @TableField(exist = false)
+    private final String genderName;
     /**
      * 生日
      */

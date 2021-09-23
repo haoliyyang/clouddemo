@@ -1,7 +1,6 @@
 package com.cloud.system.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.cloud.commons.dto.TbContactRequestDTO;
 import com.cloud.commons.response.WebApiResult;
@@ -16,6 +15,9 @@ import com.cloud.system.mapper.TbContactMapper;
 import com.cloud.system.mapper.TbUserMapper;
 import com.cloud.system.service.TbUserService;
 import com.cloud.system.service.UuidService;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,12 +48,13 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserMapper, TbUser> impleme
 
     /**
      * 新增
+     * @param img 文件
      * @param tbUserRequestDTO 请求参数DTO
      * @return 返回类型Boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean create(TbUserRequestDTO tbUserRequestDTO, String img)throws Exception {
+    public Boolean create(TbUserRequestDTO tbUserRequestDTO,String img)throws Exception {
         Uuid uuid = Uuid.builder().uuid(UuidUtil.getUuid()).build();
         uuidService.insert(uuid);
         Integer id = uuid.getId();
@@ -59,14 +62,14 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserMapper, TbUser> impleme
         TbUser tbUser = TbUser.builder()
                 .id(id)
                 .name(tbUserRequestDTO.getName())
-                .avatar(img)
                 .gender(tbUserRequestDTO.getGender())
+                .avatar(img)
                 .birthday(birthday).build();
          Boolean result = this.insert(tbUser);
          if (!result) {
              return false;
          }
-         if (tbUserRequestDTO.getRequestDTO().size() != 0) {
+         if (tbUserRequestDTO.getRequestDTO() != null) {
              WebApiResult<Boolean> res = tbContactApi.addList(tbUserRequestDTO.getRequestDTO(),tbUser.getId());
                 if (!res.getSuccess()) {
                     return false;
@@ -77,19 +80,22 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserMapper, TbUser> impleme
 
     /**
      * 用户信息详情
-     * @param uuid 参数uuid
+     * @param id 参数uuid
      * @return 返回类型TbUserResponseDTO
      */
     @Override
-    public TbUserResponseDTO getById(String uuid)throws Exception {
-        Uuid uuidEntity = uuidService.selectOne(new EntityWrapper<Uuid>().eq("uuid",uuid));
-        TbUser tbUser = selectOne(new EntityWrapper<TbUser>().eq("id",uuidEntity.getId()));
+    public TbUserResponseDTO getById(Integer id)throws Exception {
+        Uuid uuidEntity = uuidService.selectOne(new EntityWrapper<Uuid>().eq("id",id));
+        EntityWrapper<TbUser> userWrapper = new EntityWrapper<>();
+        userWrapper.eq("id",id);
+        userWrapper.setSqlSelect("id,name,avatar,gender,if(gender=0,'男','女') as genderName,birthday");
+        TbUser tbUser = selectOne(userWrapper);
 //        条件查询
         EntityWrapper<TbContact> wrapper = new EntityWrapper<>();
         wrapper.eq("user_id",uuidEntity.getId());
         List<TbContact> contacts = tbContactMapper.selectList(wrapper);
         return TbUserResponseDTO.builder().id(tbUser.getId()).name(tbUser.getName()).avatar(tbUser.getAvatar())
-                                          .gender(tbUser.isGender())
+                                          .gender(tbUser.getGender())
                                           .birthday(tbUser.getBirthday())
                                           .tbContacts(contacts)
                                           .build();
@@ -98,11 +104,10 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserMapper, TbUser> impleme
     /**
      * 修改用户信息
      * @param tbUserRequestDTO 请求DTO
-     * @param img 头像
      * @return 返回类型boolean
      */
     @Override
-    public boolean update(TbUserRequestDTO tbUserRequestDTO, String img)throws Exception {
+    public boolean update(TbUserRequestDTO tbUserRequestDTO,String img)throws Exception {
         Date birthday = new Date(tbUserRequestDTO.getBirthday().getTime());
         TbUser tbUser = TbUser.builder().id(tbUserRequestDTO.getId()).name(tbUserRequestDTO.getName())
                                         .avatar(img)
@@ -113,7 +118,7 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserMapper, TbUser> impleme
         if (!res) {
             return false;
         }
-        if (tbUserRequestDTO.getRequestDTO().size() != 0) {
+        if (tbUserRequestDTO.getRequestDTO() != null) {
             for (TbContactRequestDTO contacts : tbUserRequestDTO.getRequestDTO()) {
                 TbContactRequestDTO requestDTO = TbContactRequestDTO.builder()
                         .id(contacts.getId())
@@ -130,15 +135,15 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserMapper, TbUser> impleme
     }
     /**
      * 删除用户信息
-     * @param uuid 参数uuid
+     * @param id 参数uuid
      * @return 返回类型boolean
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean delete(String uuid)throws Exception {
-        Uuid uuidEntity = uuidService.selectOne(new EntityWrapper<Uuid>().eq("uuid",uuid));
+    public boolean delete(Integer id)throws Exception {
+        Uuid uuidEntity = uuidService.selectOne(new EntityWrapper<Uuid>().eq("id",id));
 //        删除用户信息
-        Integer res = tbUserMapper.deleteById(uuidEntity.getId());
+        Integer res = tbUserMapper.deleteById(id);
         if (res == 0) {
             return false;
         }
@@ -148,23 +153,23 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserMapper, TbUser> impleme
                 return false;
             }
 //        删除关联数据
-        return uuidService.deleteById(uuidEntity.getId());
+        return uuidService.deleteById(id);
     }
 
     /**
      * 列表查询
-     * @param pageSize 页数
      * @param pageIndex 每页数量
      * @return 返回类型List<TbUserResponseVO>
      * @throws Exception 异常
      */
     @Override
-    public List<TbUser> getList(Integer pageSize, Integer pageIndex)throws Exception {
-        if (pageSize != null && pageIndex != null) {
-            Page<TbUser> page = new Page<>(pageSize,pageIndex);
-           return tbUserMapper.selectPage(page,null);
-        }
-        Page<TbUser> page = new Page<>();
-        return tbUserMapper.selectPage(page,null);
+    public PageInfo getList(Integer pageIndex,Integer pageSize)throws Exception {
+        EntityWrapper<TbUser> wrapper = new EntityWrapper();
+        wrapper.setSqlSelect("id,name,avatar,gender,if(gender=0,'男','女') as genderName,birthday");
+        wrapper.orderBy("id",false);
+            Page<TbUser> page = PageHelper.startPage(pageIndex,pageSize);
+            List<TbUser> list = tbUserMapper.selectList(wrapper);
+            PageInfo pageInfo = new PageInfo(list,pageSize);
+            return pageInfo;
     }
 }

@@ -29,5 +29,5 @@ public final class TbContact {
     /**
      * userId关联tbuser表
      */
-    private final String userId;
+    private final Integer userId;
 }

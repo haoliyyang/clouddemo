@@ -3,10 +3,19 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/commons" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commons/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/commons/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/contactmanger" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/contactmanger/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/contactmanger/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/eureka" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/getaway" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/service-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/getaway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/getaway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/system" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/system/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/system/src/main/resources" charset="UTF-8" />
   </component>
 </project>

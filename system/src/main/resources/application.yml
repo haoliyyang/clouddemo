@@ -9,6 +9,8 @@ spring:
     url: jdbc:mysql://localhost:3306/demo?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
     username: root
     password: root
+#  resources:
+#    static-locations: classpath:/static/img
 
 mybatis-plus:
   mapper-locations: classpath*:mapper/*Mapper.xml

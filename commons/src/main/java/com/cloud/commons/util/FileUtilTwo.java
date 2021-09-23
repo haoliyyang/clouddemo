@@ -11,7 +11,7 @@ import java.util.Date;
  * 文件处理工具类
  * @author haoliuyang
  */
-public class FileUtil {
+public class FileUtilTwo {
     /**
      * 文件上传
      * @param file 文件参数
@@ -21,8 +21,8 @@ public class FileUtil {
     public static String fileUpload(MultipartFile file) throws IOException {
         //图片上传成功后，将图片的地址写到数据库
         //保存图片的路径（这是存在我项目中的images下了，你们可以设置路径）
-        String filePath = "http://localhost:8020/img/";
-//        String filePath = "/img/";
+//        String filePath = "http://localhost:8020/img/";
+        String filePath = "/img/";
         //获取原始图片的拓展名
         String originalFilename = file.getOriginalFilename();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmSS");
